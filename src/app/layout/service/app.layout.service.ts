@@ -48,9 +48,7 @@ export class LayoutService {
         menuHoverActive: false
     };
 
-    // Replays, because the theme stylesheet loads asynchronously: a chart created after
-    // the swap was requested but before the sheet finished loading would otherwise miss
-    // the notification and keep the colours of the outgoing theme.
+    // Replays: the theme stylesheet loads async, so a late subscriber still gets the swap.
     private configUpdate = new ReplaySubject<AppConfig>(1);
 
     private overlayOpen = new Subject<any>();
@@ -61,7 +59,7 @@ export class LayoutService {
 
     overlayOpen$ = this.overlayOpen.asObservable();
 
-    /** Emits when something asks for the appearance panel; the panel owns its own flag. */
+    /** Emits when something asks for the appearance panel. */
     configOpen$ = this.configOpen.asObservable();
 
     onMenuToggle() {
@@ -112,18 +110,14 @@ export class LayoutService {
         this.configUpdate.next(this.config);
     }
 
-    /**
-     * Restore the saved appearance and apply it. Called once at startup so a reader who
-     * picked a theme last visit does not watch the default flash past first.
-     */
+    /** Restore and apply the saved appearance. Called once at startup. */
     init() {
         const saved = this.readSaved();
         if (saved) {
             this.config = { ...this.config, ...saved };
         }
         this.applyScale();
-        // index.html already ships a <link> for the default theme, so on a first visit
-        // the right stylesheet is in flight and swapping it would be wasted work.
+        // index.html already ships the default theme's <link>.
         if (this.config.theme !== this.currentThemeInDocument()) {
             this.applyTheme(this.config.theme);
         }
@@ -162,11 +156,7 @@ export class LayoutService {
         return this.config.colorScheme === 'dark';
     }
 
-    /**
-     * Swap what the theme link points at, and announce the change only once the browser
-     * reports the new sheet loaded. Charts read their colours from CSS custom
-     * properties, so telling them any earlier hands them the outgoing palette.
-     */
+    /** Swap the theme link, announcing the change only once the new sheet has loaded. */
     private applyTheme(theme: string) {
         const link = document.getElementById('theme-css') as HTMLLinkElement | null;
         if (!link) {
@@ -174,15 +164,11 @@ export class LayoutService {
             return;
         }
 
-        // Components across the app carry colour transitions. Swapping the sheet sets every
-        // one of them running at once, which leaves controls part-way between two palettes
-        // and, where a background and its text cross over, briefly unreadable. The change
-        // is meant to look instant, so transitions are muted until the new sheet is in.
+        // Mute colour transitions until the new sheet is painted.
         document.body.classList.add('theme-switching');
 
         const announce = () => {
             link.removeEventListener('load', announce);
-            // Two frames: one for the new sheet to be applied, one for it to be painted.
             requestAnimationFrame(() => requestAnimationFrame(() => {
                 document.body.classList.remove('theme-switching');
             }));
@@ -209,8 +195,7 @@ export class LayoutService {
                 return null;
             }
             const parsed = JSON.parse(raw) as Partial<AppConfig>;
-            // A theme that no longer ships would leave the page with no stylesheet at
-            // all, so an unknown name is dropped rather than trusted.
+            // Drop an unknown name; it would leave the page with no stylesheet.
             if (parsed.theme && !THEMES.some((option) => option.name === parsed.theme)) {
                 delete parsed.theme;
                 delete parsed.colorScheme;
@@ -220,8 +205,7 @@ export class LayoutService {
             }
             return parsed;
         } catch {
-            // Private browsing and blocked site data both throw here. Appearance is a
-            // convenience, so fall back to the default rather than breaking startup.
+            // Private browsing and blocked site data both throw here.
             return null;
         }
     }
@@ -231,7 +215,6 @@ export class LayoutService {
             const { theme, colorScheme, scale } = this.config;
             localStorage.setItem(STORAGE_KEY, JSON.stringify({ theme, colorScheme, scale }));
         } catch {
-            // See readSaved: storage being unavailable must not stop the theme applying.
         }
     }
 

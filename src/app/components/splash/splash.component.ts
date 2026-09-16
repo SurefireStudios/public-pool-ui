@@ -82,8 +82,7 @@ export class SplashComponent {
     this.chartData$ = combineLatest([
       this.appService.getInfoChartByPayoutMode(this.pplnsEnabled ? 'all' : 'solo'),
       this.networkInfo$,
-      // Re-emits on a theme change so the datasets are rebuilt in the new palette,
-      // replaying the cached data rather than fetching it again.
+      // Re-emits on a theme change, replaying cached data rather than refetching.
       this.layoutService.configUpdate$.pipe(startWith(null))
     ]).pipe(
       map(([chartData, networkInfo]) => {
@@ -118,8 +117,7 @@ export class SplashComponent {
     this.address = new FormControl(null, bitcoinAddressValidator());
 
     this.chartOptions = this.buildChartOptions();
-    // Axis, grid and legend colours live in the options object rather than the data,
-    // so they need rebuilding on their own when the theme changes.
+    // Axis, grid and legend colours live in the options, so rebuild them separately.
     this.layoutService.configUpdate$.subscribe(() => {
       this.chartOptions = this.buildChartOptions();
     });
@@ -345,11 +343,7 @@ export class SplashComponent {
     return trimmed || `rgba(99, 102, 241, ${alpha})`;
   }
 
-  /**
-   * Read the palette out of the stylesheet each time it is asked for. The theme link is
-   * swapped at runtime, so values captured once at construction would keep describing
-   * whichever theme happened to be loaded first.
-   */
+  /** Read the palette on demand: the theme link is swapped at runtime. */
   private themeColors() {
     const documentStyle = getComputedStyle(document.documentElement);
     return {

@@ -14,8 +14,7 @@ export class AppComponent {
 
   public particles$: Observable<boolean>;
   constructor(private localService: LocalStorageService, layoutService: LayoutService) {
-    // Applies the saved theme and text size before the layout renders, so a reader who
-    // chose one last visit is not shown the default first.
+    // Apply the saved appearance before the layout renders.
     layoutService.init();
     this.particles$ = this.localService.particles$;
   }

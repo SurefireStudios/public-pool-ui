@@ -16,26 +16,17 @@ interface ThemeGroup {
 })
 export class AppConfigComponent implements OnDestroy {
 
-    /**
-     * The panel owns its own visibility rather than reading the shared layout state, so
-     * PrimeNG's two-way `visible` binding has a plain field to write back to.
-     */
+    /** Own field, so PrimeNG's two-way `visible` binding has something to write to. */
     public visible = false;
 
     private readonly openSubscription: Subscription;
 
-    /**
-     * Which half of the catalog the picker is showing. It follows the active theme on
-     * open, so the panel starts on the tab holding the swatch that is already selected
-     * rather than on a list the reader has to switch away from.
-     */
+    /** Which half of the catalog is showing; follows the active theme on open. */
     public mode: ThemeMode;
 
     constructor(public layoutService: LayoutService) {
         this.mode = this.layoutService.config.colorScheme === 'light' ? 'light' : 'dark';
         this.openSubscription = this.layoutService.configOpen$.subscribe(() => {
-            // Open on the tab holding the swatch that is already selected, so the reader
-            // is not dropped onto a list they have to switch away from.
             this.mode = this.layoutService.isDarkTheme() ? 'dark' : 'light';
             this.visible = true;
         });
@@ -78,7 +69,7 @@ export class AppConfigComponent implements OnDestroy {
         this.layoutService.changeScale(this.scale + 1);
     }
 
-    /** Used by the template's `@for` so switching tabs reuses the swatch elements. */
+    /** `@for` track fn. */
     trackByName(_index: number, theme: ThemeOption) {
         return theme.name;
     }

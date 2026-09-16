@@ -1,6 +1,5 @@
-// Catalog of the PrimeNG themes shipped under src/assets/layout/styles/theme.
-// `primary` and `surface` are read from each theme's own stylesheet so the
-// swatches in the picker show the real colours rather than an approximation.
+// PrimeNG themes shipped under src/assets/layout/styles/theme.
+// `primary`, `surface` and `text` are read from each theme's own stylesheet.
 
 export type ThemeMode = 'dark' | 'light';
 
@@ -14,7 +13,7 @@ export interface ThemeOption {
     primary: string;
     /** --surface-ground */
     surface: string;
-    /** --text-color, used so a swatch label sits legibly on its own surface. */
+    /** --text-color */
     text: string;
 }
 

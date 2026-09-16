@@ -1,5 +1,4 @@
-// The panel is deliberately built from PrimeNG's own custom properties rather than
-// fixed colours, so it re-skins along with whatever theme the reader picks in it.
+// Built from PrimeNG custom properties so the panel re-skins with the chosen theme.
 
 :host ::ng-deep .appearance-sidebar {
     width: 22rem;
@@ -66,8 +65,7 @@
     gap: 0.5rem;
 }
 
-// Each swatch paints the theme's real surface colour, with its accent as the dot, so
-// the choice is previewed rather than described.
+// Each swatch paints the theme's real surface colour, with its accent as the dot.
 .appearance-swatch {
     position: relative;
     display: flex;
@@ -108,13 +106,10 @@
     width: 1.1rem;
     height: 1.1rem;
     border-radius: 50%;
-    // The ring keeps a pale accent legible against a pale surface, and vice versa.
     box-shadow: 0 0 0 1px rgb(128 128 128 / 45%);
 }
 
-// A swatch sits on the previewed theme's surface, not the current one, so the label
-// cannot use --text-color. It uses that theme's own text colour instead, which keeps
-// the pairing legible by construction rather than by guesswork.
+// A swatch sits on the previewed theme's surface, so the label uses that theme's text colour.
 .appearance-swatch-label {
     min-width: 0;
     overflow: hidden;
