@@ -13,11 +13,9 @@ import { AverageTimeToBlockPipe } from 'src/app/pipes/average-time-to-block.pipe
 /**
  * Highest `bestDifficulty` among the given workers, as a number.
  *
- * The API sends difficulty as a string, for example "294141974944674.8". Comparing the
- * raw values with `>` only works while one side is still a number: once the accumulator
- * holds one of those strings, both operands are strings and the comparison becomes
- * lexicographic, so "80" ranks above "272" because "8" sorts above "2". Coercing first
- * keeps the comparison numeric no matter what the API sends.
+ * The API sends difficulty as a string, so once the accumulator holds one the
+ * comparison turns lexicographic and "80" ranks above "272". Coercing first
+ * keeps it numeric.
  */
 export function maxBestDifficulty(workers: any[]): number {
   return workers.reduce((best: number, worker: any) => {
